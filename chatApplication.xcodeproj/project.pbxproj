@@ -118,7 +118,7 @@
 				TargetAttributes = {
 					EEE31B531EB5E9EF0044656C = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = GU388YC6S7;
+						DevelopmentTeam = WJ2494P78F;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -283,11 +283,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = GU388YC6S7;
+				DEVELOPMENT_TEAM = WJ2494P78F;
 				INFOPLIST_FILE = chatApplication/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.SealDev.chatApplication;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SealDev.chatApplicationfb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
@@ -297,11 +297,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = GU388YC6S7;
+				DEVELOPMENT_TEAM = WJ2494P78F;
 				INFOPLIST_FILE = chatApplication/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.SealDev.chatApplication;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SealDev.chatApplicationfb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
