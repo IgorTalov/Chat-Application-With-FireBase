@@ -7,18 +7,28 @@
 //
 
 import UIKit
+import Firebase
 
 class ViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        
+            
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "LogOut", style: .plain, target: self, action: #selector(handleLogOut))
+        
+        if FIRAuth.auth()?.currentUser?.uid == nil {
+            perform(#selector(handleLogOut), with: nil, afterDelay: 0)
+        }
+        
     }
 
     func handleLogOut() {
-        print("log out")
+        
+        do {
+            try FIRAuth.auth()?.signOut()
+        } catch let logoutError {
+            print(logoutError)
+        }
         
         let loginController = LoginController()
         present(loginController, animated: true, completion: nil)
