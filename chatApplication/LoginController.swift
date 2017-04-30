@@ -11,6 +11,8 @@ import Firebase
 
 class LoginController: UIViewController {
 
+    //Var's
+    
     let inputsContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.white
@@ -69,11 +71,13 @@ class LoginController: UIViewController {
         return tf
     }()
     
-    let profileImageView: UIImageView = {
+    lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.image = UIImage(named: "userProfileImage")
         imageView.contentMode = .scaleAspectFill
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleSelectProfileImage)))
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
     
@@ -101,6 +105,8 @@ class LoginController: UIViewController {
         setupProfileImageView()
         setupLoginRegisterSegmentedControl()
     }
+    
+    //Setup view's
     
     func setupLoginRegisterSegmentedControl() {
         
@@ -188,6 +194,8 @@ class LoginController: UIViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
+    
+    //Handlers
     
     func handleLoginOrRegister() {
         if loginRegisterSegmentedControl.selectedSegmentIndex == 0 {
