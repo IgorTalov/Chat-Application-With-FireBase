@@ -21,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.makeKeyAndVisible()
         
-        let vc = ViewController()
+        let vc = MessagesController()
         let navController = UINavigationController(rootViewController: vc)
         
         window?.rootViewController = navController
