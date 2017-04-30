@@ -7,14 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EEC9242B1EB5FA4900B22FDE /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC9242A1EB5FA4900B22FDE /* Extensions.swift */; };
 		EEE31B581EB5E9EF0044656C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE31B571EB5E9EF0044656C /* AppDelegate.swift */; };
 		EEE31B5A1EB5E9EF0044656C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE31B591EB5E9EF0044656C /* ViewController.swift */; };
 		EEE31B5D1EB5E9EF0044656C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EEE31B5B1EB5E9EF0044656C /* Main.storyboard */; };
 		EEE31B5F1EB5E9EF0044656C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EEE31B5E1EB5E9EF0044656C /* Assets.xcassets */; };
 		EEE31B621EB5E9EF0044656C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EEE31B601EB5E9EF0044656C /* LaunchScreen.storyboard */; };
+		EEE31B6B1EB5F0D70044656C /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE31B6A1EB5F0D70044656C /* LoginController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		EEC9242A1EB5FA4900B22FDE /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		EEE31B541EB5E9EF0044656C /* chatApplication.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = chatApplication.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EEE31B571EB5E9EF0044656C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EEE31B591EB5E9EF0044656C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -22,6 +25,7 @@
 		EEE31B5E1EB5E9EF0044656C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EEE31B611EB5E9EF0044656C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		EEE31B631EB5E9EF0044656C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EEE31B6A1EB5F0D70044656C /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +39,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EEC924291EB5FA1C00B22FDE /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				EEC9242A1EB5FA4900B22FDE /* Extensions.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
 		EEE31B4B1EB5E9EF0044656C = {
 			isa = PBXGroup;
 			children = (
@@ -54,14 +66,24 @@
 		EEE31B561EB5E9EF0044656C /* chatApplication */ = {
 			isa = PBXGroup;
 			children = (
+				EEC924291EB5FA1C00B22FDE /* Extensions */,
+				EEE31B691EB5F0B40044656C /* Controller */,
 				EEE31B571EB5E9EF0044656C /* AppDelegate.swift */,
-				EEE31B591EB5E9EF0044656C /* ViewController.swift */,
 				EEE31B5B1EB5E9EF0044656C /* Main.storyboard */,
 				EEE31B5E1EB5E9EF0044656C /* Assets.xcassets */,
 				EEE31B601EB5E9EF0044656C /* LaunchScreen.storyboard */,
 				EEE31B631EB5E9EF0044656C /* Info.plist */,
 			);
 			path = chatApplication;
+			sourceTree = "<group>";
+		};
+		EEE31B691EB5F0B40044656C /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				EEE31B6A1EB5F0D70044656C /* LoginController.swift */,
+				EEE31B591EB5E9EF0044656C /* ViewController.swift */,
+			);
+			name = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -138,7 +160,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				EEE31B5A1EB5E9EF0044656C /* ViewController.swift in Sources */,
+				EEE31B6B1EB5F0D70044656C /* LoginController.swift in Sources */,
 				EEE31B581EB5E9EF0044656C /* AppDelegate.swift in Sources */,
+				EEC9242B1EB5FA4900B22FDE /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,6 +285,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = GU388YC6S7;
 				INFOPLIST_FILE = chatApplication/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.SealDev.chatApplication;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -274,6 +299,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = GU388YC6S7;
 				INFOPLIST_FILE = chatApplication/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.SealDev.chatApplication;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -300,6 +326,7 @@
 				EEE31B681EB5E9EF0044656C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
