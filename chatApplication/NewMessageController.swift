@@ -13,6 +13,8 @@ class NewMessageController: UITableViewController {
 
     let cellID = "cellID"
     
+    var messagesController: MessagesController?
+    
     var users = [User]()
     
     override func viewDidLoad() {
@@ -77,6 +79,12 @@ class NewMessageController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        dismiss(animated: true) { 
+            print("Dismiss completed")
+            let user = self.users[indexPath.row]
+            self.messagesController?.showChatControllerForUser(user: user)
+        }
+        
     }
     
 }

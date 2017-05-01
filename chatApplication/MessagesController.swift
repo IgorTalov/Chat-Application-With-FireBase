@@ -84,6 +84,14 @@ class MessagesController: UITableViewController {
         self.navigationItem.titleView = titleView
     }
     
+    func showChatControllerForUser(user: User) {
+        print(123)
+        let layout = UICollectionViewFlowLayout()
+        let chatController = ChatController(collectionViewLayout: layout)
+        chatController.user = user
+        navigationController?.pushViewController(chatController, animated: true)
+    }
+    
     func handleLogOut() {
         
         do {
@@ -100,6 +108,7 @@ class MessagesController: UITableViewController {
     func handleNewMeessage() {
         print("new message")
         let newMessageController = NewMessageController()
+        newMessageController.messagesController = self
         let navController = UINavigationController(rootViewController: newMessageController)
         present(navController, animated: true, completion: nil)
         
