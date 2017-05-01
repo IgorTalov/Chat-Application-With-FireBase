@@ -11,7 +11,9 @@ import Firebase
 
 class LoginController: UIViewController {
 
-    //Var's
+    //MARK: Var's
+    
+    var messagesController: MessagesController?
     
     let inputsContainerView: UIView = {
         let view = UIView()
@@ -106,7 +108,7 @@ class LoginController: UIViewController {
         setupLoginRegisterSegmentedControl()
     }
     
-    //Setup view's
+    //MARK: Setup view's
     
     func setupLoginRegisterSegmentedControl() {
         
@@ -195,7 +197,7 @@ class LoginController: UIViewController {
         return .lightContent
     }
     
-    //Handlers
+    //MARK: Handlers
     
     func handleLoginOrRegister() {
         if loginRegisterSegmentedControl.selectedSegmentIndex == 0 {
@@ -219,48 +221,12 @@ class LoginController: UIViewController {
             }
             
             //successfully logged in our user
+            
+            self.messagesController?.fetchUserAndSetupNavBarTitle()
+            
             self.dismiss(animated: true, completion: nil)
         })
         
-    }
-    
-    func handleRegister() {
-        
-        guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text else {
-            print("Form is not valid")
-            return
-        }
-        
-        FIRAuth.auth()?.createUser(withEmail: email, password: password, completion: { (user, error) in
-            
-            if error != nil {
-                print("\(error)")
-                return
-            }
-            
-            guard let uid = user?.uid else {
-                return
-            }
-            
-            //successfully authentificated user
-            let dbUrl = "https://chatapplication-cf55d.firebaseio.com/"
-            let ref = FIRDatabase.database().reference(fromURL: dbUrl)
-            let userReference = ref.child("users").child(uid)
-            let values = ["name": name, "email": email]
-            userReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
-                
-                if err != nil {
-                    print("\(err)")
-                    return
-                }
-                
-                print("Saved user successfully into Firebase db")
-                
-                self.dismiss(animated: true, completion: nil)
-                
-            })
-        })
-        print(123)
     }
     
     func handleLoginRegisterChange() {
