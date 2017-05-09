@@ -15,6 +15,7 @@ class MessagesController: UITableViewController {
     
     var messages = [Message]()
     var messagesDictinary = [String: Message]()
+    var timer: Timer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,8 +59,8 @@ class MessagesController: UITableViewController {
                     let message = Message()
                     message.setValuesForKeys(dictinary)
                     
-                    if let toId = message.toId {
-                        self.messagesDictinary[toId] = message
+                    if let chatPartnerId = message.chatPartnerId() as String! {
+                        self.messagesDictinary[chatPartnerId] = message
                         
                         self.messages = Array(self.messagesDictinary.values)
                         self.messages.sort(by: { (message1, message2) -> Bool in
@@ -67,15 +68,18 @@ class MessagesController: UITableViewController {
                         })
                     }
                     
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
-                    }
+                    self.timer?.invalidate()
+                    self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleReloadTable), userInfo: nil, repeats: false)
                 }
-                
-                
             }, withCancel: nil)
             
         }, withCancel: nil)
+    }
+    
+    func handleReloadTable() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
     
     func observeMessages() {

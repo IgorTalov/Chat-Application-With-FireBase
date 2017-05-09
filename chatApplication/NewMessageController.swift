@@ -41,7 +41,6 @@ class NewMessageController: UITableViewController {
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }
-                
             }
 
         }, withCancel: nil)
