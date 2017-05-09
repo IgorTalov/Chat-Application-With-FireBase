@@ -28,8 +28,6 @@ class MessagesController: UITableViewController {
         
         checkIfUserIsLoggedIn()
         
-//        observeMessages()
-        
         observeUserMessages()
     }
 
@@ -42,7 +40,6 @@ class MessagesController: UITableViewController {
     }
     
     func observeUserMessages() {
-        
         guard let uid = FIRAuth.auth()?.currentUser?.uid else {return}
         
         let ref = FIRDatabase.database().reference().child("user-messages").child(uid)

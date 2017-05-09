@@ -21,6 +21,45 @@ class ChatController: UICollectionViewController, UITextFieldDelegate, UICollect
         }
     }
     
+    lazy var inputContainerView: UIView = {
+        let containerView = UIView()
+        containerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50)
+        containerView.backgroundColor = UIColor.white
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let sendButton = UIButton(type: .system)
+        sendButton.setTitle("Send", for: .normal)
+        sendButton.translatesAutoresizingMaskIntoConstraints = false
+        sendButton.addTarget(self, action: #selector(handleSendMessage), for: .touchUpInside)
+        
+        containerView.addSubview(sendButton)
+        
+        sendButton.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
+        sendButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        sendButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        sendButton.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
+        
+        containerView.addSubview(self.inputTextField)
+        
+        self.inputTextField.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 8).isActive = true
+        self.inputTextField.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        self.inputTextField.rightAnchor.constraint(equalTo: sendButton.leftAnchor, constant: 8).isActive = true
+        self.inputTextField.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
+        self.inputTextField.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        
+        let separatorLineView = UIView()
+        separatorLineView.backgroundColor = UIColor.lightGray
+        separatorLineView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addSubview(separatorLineView)
+        
+        separatorLineView.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
+        separatorLineView.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
+        separatorLineView.widthAnchor.constraint(equalTo: containerView.widthAnchor).isActive = true
+        separatorLineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        
+        return containerView
+    }()
+    
     lazy var inputTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Enter message..."
@@ -28,6 +67,8 @@ class ChatController: UICollectionViewController, UITextFieldDelegate, UICollect
         textField.delegate = self
         return textField
     }()
+    
+    //MARK: ViewController LifeCycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,16 +78,60 @@ class ChatController: UICollectionViewController, UITextFieldDelegate, UICollect
         collectionView?.alwaysBounceVertical = true
         collectionView?.backgroundColor = UIColor.white
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView?.keyboardDismissMode = .interactive
         
-        setupInputComponents()
+//        setupInputComponents()
         
         observeMessanges()
+        
+//        setupKeyboardObservers()
+    }
+    
+    override var inputAccessoryView: UIView? {
+        get {
+            return inputContainerView
+        }
+    }
+    
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    func setupKeyboardObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+    }
+    
+    func handleKeyboardHide(notification: Notification) {
+        let keyBoardDuration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? Double
+        containerViewBottomAnchor?.constant = 0
+        UIView.animate(withDuration: keyBoardDuration!) {
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    func handleKeyboardShow(notification: Notification) {
+        let keyBoardframe = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect
+        let keyBoardDuration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? Double
+        print("\(keyBoardframe)")
+        
+        containerViewBottomAnchor?.constant = -(keyBoardframe?.height)!
+        UIView.animate(withDuration: keyBoardDuration!) {
+            self.view.layoutIfNeeded()
+        }
+        
     }
     
     func observeMessanges() {
-        guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
+        guard let uid = FIRAuth.auth()?.currentUser?.uid, let toid = user?.id else { return }
         
-        let userMessagesRef = FIRDatabase.database().reference().child("user-messages").child(uid)
+        let userMessagesRef = FIRDatabase.database().reference().child("user-messages").child(uid).child(toid)
         userMessagesRef.observe(.childAdded, with: { (snapshot) in
             
             let messageID = snapshot.key
@@ -71,6 +156,9 @@ class ChatController: UICollectionViewController, UITextFieldDelegate, UICollect
     
     //MARK: Setup Views
     
+    
+    var containerViewBottomAnchor: NSLayoutConstraint?
+    
     func setupInputComponents() {
         
         let containerView = UIView()
@@ -81,7 +169,11 @@ class ChatController: UICollectionViewController, UITextFieldDelegate, UICollect
         
         containerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         containerView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        
+        containerViewBottomAnchor = containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        containerViewBottomAnchor?.isActive = true
+        
         containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         containerView.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
@@ -125,7 +217,7 @@ class ChatController: UICollectionViewController, UITextFieldDelegate, UICollect
         let toId = user!.id!
         let fromId = FIRAuth.auth()!.currentUser!.uid
         let timeStamp = Int(NSDate().timeIntervalSince1970)
-        let values = ["text": "Test message for test bubbles. Long lenght text..."/*inputTextField.text!*/, "toId": toId, "fromId": fromId, "timeStamp": timeStamp] as [String : Any]
+        let values = ["text": inputTextField.text!, "toId": toId, "fromId": fromId, "timeStamp": timeStamp] as [String : Any]
         childRef.updateChildValues(values) { (error, ref) in
             
             if error != nil {
@@ -133,14 +225,15 @@ class ChatController: UICollectionViewController, UITextFieldDelegate, UICollect
                return
             }
             
-            let userMessageRef = FIRDatabase.database().reference().child("user-messages").child(fromId)
+            let userMessageRef = FIRDatabase.database().reference().child("user-messages").child(fromId).child(toId)
             
             let messageId = childRef.key
             userMessageRef.updateChildValues([messageId: 1])
             
-            let recipientUserMessagesRef = FIRDatabase.database().reference().child("user-messages").child(toId)
+            let recipientUserMessagesRef = FIRDatabase.database().reference().child("user-messages").child(toId).child(fromId)
             recipientUserMessagesRef.updateChildValues([messageId: 1])
         }
+        inputTextField.text = ""
     }
 
     //MARK: UITextFieldDelegate
@@ -179,7 +272,9 @@ class ChatController: UICollectionViewController, UITextFieldDelegate, UICollect
             height = estimatedFrameForText(text: text).height + 20
         }
         
-        return CGSize(width: view.frame.width, height: height)
+        let width = UIScreen.main.bounds.width
+        
+        return CGSize(width: width, height: height)
     }
     
     private func setupCell(cell: ChatMessageCell, message: Message) {
