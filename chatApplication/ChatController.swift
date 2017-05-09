@@ -9,8 +9,12 @@
 import UIKit
 import Firebase
 
-class ChatController: UICollectionViewController, UITextFieldDelegate {
+class ChatController: UICollectionViewController, UITextFieldDelegate, UICollectionViewDelegateFlowLayout {
  
+    let cellId = "cellId"
+    
+    var messages = [Message]()
+    
     var user: User? {
         didSet {
             navigationItem.title = user?.name
@@ -27,10 +31,39 @@ class ChatController: UICollectionViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-    
+        collectionView?.alwaysBounceVertical = true
         collectionView?.backgroundColor = UIColor.white
+        collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
         
         setupInputComponents()
+        
+        observeMessanges()
+    }
+    
+    func observeMessanges() {
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
+        
+        let userMessagesRef = FIRDatabase.database().reference().child("user-messages").child(uid)
+        userMessagesRef.observe(.childAdded, with: { (snapshot) in
+            
+            let messageID = snapshot.key
+            let messagesRef = FIRDatabase.database().reference().child("messages").child(messageID)
+            messagesRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                
+                if let dictinary = snapshot.value as? [String: AnyObject] {
+                   let message = Message()
+                   message.setValuesForKeys(dictinary)
+                    
+                    if message.chatPartnerId() == self.user?.id {
+                        self.messages.append(message)
+                        
+                        DispatchQueue.main.async {
+                            self.collectionView?.reloadData()
+                        }
+                    }
+                }
+            }, withCancel: nil)
+        }, withCancel: nil)
     }
     
     //MARK: Setup Views
@@ -86,23 +119,50 @@ class ChatController: UICollectionViewController, UITextFieldDelegate {
     func handleSendMessage() {
         let ref = FIRDatabase.database().reference().child("messages")
         let childRef = ref.childByAutoId()
-        let values = ["text": inputTextField.text!, "name": "Test User"]
-//        let values = ["text": "Test Message", "name": "Test User"]
-        childRef.updateChildValues(values)
+        let toId = user!.id!
+        let fromId = FIRAuth.auth()!.currentUser!.uid
+        let timeStamp = Int(NSDate().timeIntervalSince1970)
+        let values = ["text": "Test message for test bubbles"/*inputTextField.text!*/, "toId": toId, "fromId": fromId, "timeStamp": timeStamp] as [String : Any]
+        childRef.updateChildValues(values) { (error, ref) in
+            
+            if error != nil {
+               print("\(error)")
+               return
+            }
+            
+            let userMessageRef = FIRDatabase.database().reference().child("user-messages").child(fromId)
+            
+            let messageId = childRef.key
+            userMessageRef.updateChildValues([messageId: 1])
+        }
     }
-    
-    
-    //MARK: Touches
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        collectionView.endEditing(true)
-        print(123)
-    }
-    
+
     //MARK: UITextFieldDelegate
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         handleSendMessage()
         return true
+    }
+    
+    //MARK: UICollectionViewDataSource
+    
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ChatMessageCell
+    
+        let message = messages[indexPath.item]
+        
+        cell.textView.text = message.text
+        
+        return cell
+    }
+    
+     //MARK: UICollectionViewDelegateFlowLayout
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: view.frame.width, height: 80)
     }
 }

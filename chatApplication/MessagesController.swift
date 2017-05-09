@@ -11,6 +11,11 @@ import Firebase
 
 class MessagesController: UITableViewController {
 
+    let cellId = "cellID"
+    
+    var messages = [Message]()
+    var messagesDictinary = [String: Message]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
             
@@ -18,8 +23,13 @@ class MessagesController: UITableViewController {
         let image = UIImage(named: "plane")
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(handleNewMeessage))
         
+        tableView.register(MessageCell.self, forCellReuseIdentifier: cellId)
         
         checkIfUserIsLoggedIn()
+        
+//        observeMessages()
+        
+        observeUserMessages()
     }
 
     func checkIfUserIsLoggedIn() {
@@ -28,6 +38,72 @@ class MessagesController: UITableViewController {
         } else {
             fetchUserAndSetupNavBarTitle()
         }
+    }
+    
+    func observeUserMessages() {
+        
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else {return}
+        
+        let ref = FIRDatabase.database().reference().child("user-messages").child(uid)
+        ref.observe(.childAdded, with: { (snapshot) in
+            
+            let messageId = snapshot.key
+            let messageReference = FIRDatabase.database().reference().child("messages").child(messageId)
+            messageReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                
+                if let dictinary = snapshot.value as? [String : AnyObject] {
+                    
+                    print("\(snapshot)")
+                    
+                    let message = Message()
+                    message.setValuesForKeys(dictinary)
+                    
+                    if let toId = message.toId {
+                        self.messagesDictinary[toId] = message
+                        
+                        self.messages = Array(self.messagesDictinary.values)
+                        self.messages.sort(by: { (message1, message2) -> Bool in
+                            return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
+                        })
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                }
+                
+                
+            }, withCancel: nil)
+            
+        }, withCancel: nil)
+    }
+    
+    func observeMessages() {
+        let ref = FIRDatabase.database().reference().child("messages")
+        ref.observe(.childAdded, with: { (snapshot) in
+            
+            if let dictinary = snapshot.value as? [String : AnyObject] {
+                
+               print("\(snapshot)")
+                
+               let message = Message()
+               message.setValuesForKeys(dictinary)
+                
+                if let toId = message.toId {
+                   self.messagesDictinary[toId] = message
+                    
+                   self.messages = Array(self.messagesDictinary.values)
+                   self.messages.sort(by: { (message1, message2) -> Bool in
+                    return (message1.timeStamp?.intValue)! > (message2.timeStamp?.intValue)!
+                   })
+                }
+                
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            }
+
+        }, withCancel: nil)
     }
     
     func fetchUserAndSetupNavBarTitle() {
@@ -44,6 +120,13 @@ class MessagesController: UITableViewController {
     }
     
     func setupNavBarWithUser(user: User) {
+        
+        messages.removeAll()
+        messagesDictinary.removeAll()
+        tableView.reloadData()
+        
+        observeUserMessages()
+        
         let titleView = UIView()
         titleView.frame = CGRect(x: 0, y: 0, width: 150, height: 40)
         
@@ -114,7 +197,51 @@ class MessagesController: UITableViewController {
         
     }
 
+    //MARK: UITableViewDataSource
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! MessageCell
+        
+        let message = messages[indexPath.row]
+        
+        cell.message = message
+        
+        return cell
+    }
+    
+    //MARK: UITableViewDelegate
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 64
+    }
 
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let message = messages[indexPath.row]
 
+        let chatPartnerId = message.chatPartnerId()
+        
+        let ref = FIRDatabase.database().reference().child("users").child(chatPartnerId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            
+            if let dictinary = snapshot.value as? [String: AnyObject] {
+                let user = User()
+                user.id = chatPartnerId
+                user.setValuesForKeys(dictinary)
+                
+                self.showChatControllerForUser(user: user)
+            }
+            
+        }, withCancel: nil)
+
+    }
+    
 }
 
